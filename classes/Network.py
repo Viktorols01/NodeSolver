@@ -24,8 +24,6 @@ class Network:
                 print("Iteration",k)
             self.solveIteration(verbose)
             k += 1
-            if k >= 20:
-                break
         if verbose:
             print("Newton-Raphson finished in",k,"iterations.")
             print("Initial norm:", res_init)
@@ -40,19 +38,22 @@ class Network:
             assert(node.current_known != node.potential_known)
 
             if not node.current_known:
-                jacobian[i][i] = -1
-            for pair in node.connections:
-                (connection, subnode) = pair
-                j = self.nodes.index(subnode)
-                jacobian[j][i] -= connection.derivative(subnode.potential, node.potential)
-                if not node.potential_known:
-                    jacobian[i][i] += connection.derivative(node.potential, subnode.potential)
+                jacobian[i][i] -= 1 # current in
+            else:
+                for pair in node.connections:
+                    (connection, subnode) = pair
+                    j = self.nodes.index(subnode)
+                    jacobian[j][i] -= connection.derivative(node.potential, subnode.potential) # current in for subnode
+                    if not node.potential_known:
+                        jacobian[i][i] += connection.derivative(node.potential, subnode.potential) # current out
         function = self.function()
-        df = np.linalg.solve(jacobian, -self.function())
 
         if verbose:
             print("Jacobian:\n", jacobian)
             print("Function:", function)
+
+        df = np.linalg.solve(jacobian, -self.function())
+        if verbose:
             print("df", df)
 
         for i in range(n):
