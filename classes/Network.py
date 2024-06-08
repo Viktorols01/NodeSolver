@@ -1,68 +1,85 @@
-import numpy as np
+from classes.JFNKsolver import JFNKsolver
 
 class Network:
     def __init__(self):
         self.nodes = []
+        self.node_names = []
+        self.node_count = 0
+        self.components = []
+        self.component_names = []
+        self.component_count = 0
 
-    def add(self, node):
+    def add_node(self, node):
         self.nodes.append(node)
+        self.node_names.append(f"node {self.node_count}")
+        self.node_count += 1
 
-    def function(self):
-        n = len(self.nodes)
-        vector = np.zeros(shape = [n], dtype = float)
-        for i in range(n):
-            node = self.nodes[i]
-            vector[i] = node.function()
-        return vector
+    def add_component(self, component):
+        self.components.append(component)
+        self.component_names.append(f"component {self.component_count}")
+        self.component_count += 1
 
-    def solve(self, verbose = False, rtol = 0, atol = 10**-3):
-        res_init = np.linalg.norm(self.function())
+    def solve(self):
+        solver = JFNKsolver(initial_value=0)
+        self.add_node_equations(solver)
+        self.add_component_equations(solver)
+        solver.solve(verbose=True, ndigits=2)
+        
+        variable_map = solver.get_variable_map()
+        print(variable_map)
+        for variable_name in variable_map:
+            variable_value = variable_map[variable_name]
 
-        k = 1
-        while np.linalg.norm(self.function()) > rtol*res_init + atol:
-            if verbose:
-                print("Iteration",k)
-            self.solveIteration(verbose)
-            k += 1
-        if verbose:
-            print("Newton-Raphson finished in",k,"iterations.")
-            print("Initial norm:", res_init)
-            print("Final norm", np.linalg.norm(self.function()))
-
-    def solveIteration(self, verbose):
-        n = len(self.nodes)
-        jacobian = np.zeros(shape = [n, n], dtype = float)
-        for i in range(n):
-            node = self.nodes[i]
-
-            assert(node.current_known != node.potential_known)
-
-            if not node.current_known:
-                jacobian[i][i] -= 1 # current in
+            type = variable_name.split(" ")[0]
+            if type == "node":
+                index = self.node_names.index(variable_name)
+                self.nodes[index].set_potential(variable_value)
             else:
-                for pair in node.connections:
-                    (connection, subnode) = pair
-                    j = self.nodes.index(subnode)
-                    jacobian[j][i] -= connection.derivative(node.potential, subnode.potential) # current in for subnode
-                    if not node.potential_known:
-                        jacobian[i][i] += connection.derivative(node.potential, subnode.potential) # current out
-        function = self.function()
+                index = self.component_names.index(variable_name)
+                self.components[index].set_current(variable_value)
 
-        if verbose:
-            print("Jacobian:\n", jacobian)
-            print("Function:", function)
-
-        df = np.linalg.solve(jacobian, -self.function())
-        if verbose:
-            print("df", df)
-
-        for i in range(n):
+    def add_node_equations(self, solver):
+        solver.add_equation(1, [self.node_names[0]], lambda x: x[0])
+        for i in range(1, self.node_count):
             node = self.nodes[i]
-            if not node.current_known:
-                node.current += df[i]
-            if not node.potential_known:
-                node.potential += df[i]
+            connections = node.get_connections()
+            n = len(connections)
+            sign_list = []
+            name_list = []
+            for pair in connections:
+                component, socket = pair
+                if socket == "in":
+                    sign_list.append(-1)
+                elif socket == "out":
+                    sign_list.append(1)
+                else:
+                    raise Exception("socket is not 'in' or 'our'")
+                index = self.components.index(component)
+                name_list.append(self.component_names[index])
+            def function(x):
+                sum = 0
+                for i in range(n):
+                    sum += sign_list[i]*x[i]
+                return sum
+            solver.add_equation(n, name_list, function)
 
-    def print(self, ndigits = 0):
-        for node in self.nodes:
-            node.print(ndigits = ndigits)
+    def add_component_equations(self, solver):
+        for i in range(self.component_count):
+            component = self.components[i]
+            name = self.component_names[i]
+
+            node_in = component.get_sockets()["in"]
+            index_in = self.nodes.index(node_in)
+            name_in = self.node_names[index_in]
+
+            node_out = component.get_sockets()["out"]
+            index_out = self.nodes.index(node_out)
+            name_out = self.node_names[index_out]
+
+            if index_in == 0:
+                solver.add_equation(3, [name_out, name_in, name], component.function_in_known())
+            elif index_out == 0:
+                solver.add_equation(3, [name_out, name_in, name], component.function_out_known())
+            else:
+                solver.add_equation(3, [name_out, name_in, name], component.function())
+            

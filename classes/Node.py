@@ -1,40 +1,23 @@
 class Node:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
         self.connections = []
-
-        self.potential_known = False
-        self.current_known = False
         self.potential = 0
-        self.current = 0
 
-    def setPotential(self, potential):
+    def set_potential(self, potential):
         self.potential = potential
-        self.potential_known = True
 
-    def setCurrent(self, current):
-        self.current = current
-        self.current_known = True
+    def get_connections(self):
+        return self.connections
 
-    def connect(self, connection, node):
-        pair = (connection, node)
-        self.connections.append(pair)
+    def connect_to(self, component, socket):
+        self.connections.append((component, socket))
 
-        pair_reversed = (connection, self)
-        node.connections.append(pair_reversed)
+        component.sockets[socket] = self
 
-    def function(self):
-        sum = 0
-        for pair in self.connections:
-            (connection, node) = pair
-            sum += connection.function(self.potential, node.potential)
-
-        sum -= self.current
-        return sum
 
     # --- DEBUG ---
-    def print(self, ndigits = 0):
-        print("Node ", self.name)
+    def print(self, name, ndigits = 0):
+        print("Node ", name)
         if self.potential_known:
             print("\tPotential (set):", round(self.potential, ndigits),"V")
         else:
