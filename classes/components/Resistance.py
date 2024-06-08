@@ -1,5 +1,3 @@
-from classes.components.Component import Component
-
 class Resistance:
     def __init__(self, R):
         self.R = R
@@ -17,6 +15,9 @@ class Resistance:
     
     def set_current(self, current):
         self.current = current
+
+    def get_current(self):
+        return self.current
 
     # u_out, u_in, i
     def function(self):

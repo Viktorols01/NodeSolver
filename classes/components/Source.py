@@ -14,6 +14,9 @@ class Source:
     
     def set_current(self, current):
         self.current = current
+
+    def get_current(self):
+        return self.current
     
     # u_out, u_in, i
     def function(self):

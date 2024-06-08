@@ -26,7 +26,6 @@ class Network:
         solver.solve(verbose=True, ndigits=2)
         
         variable_map = solver.get_variable_map()
-        print(variable_map)
         for variable_name in variable_map:
             variable_value = variable_map[variable_name]
 
@@ -40,6 +39,7 @@ class Network:
 
     def add_node_equations(self, solver):
         solver.add_equation(1, [self.node_names[0]], lambda x: x[0])
+
         for i in range(1, self.node_count):
             node = self.nodes[i]
             connections = node.get_connections()
@@ -54,14 +54,17 @@ class Network:
                     sign_list.append(1)
                 else:
                     raise Exception("socket is not 'in' or 'our'")
+                
                 index = self.components.index(component)
                 name_list.append(self.component_names[index])
-            def function(x):
+
+            # viktigt: early binding!
+            def function(x, sign_list_, n_):
                 sum = 0
-                for i in range(n):
-                    sum += sign_list[i]*x[i]
+                for j in range(n_):
+                    sum += sign_list_[j]*x[j]
                 return sum
-            solver.add_equation(n, name_list, function)
+            solver.add_equation(n, name_list, lambda x, s = sign_list, t = n: function(x, s, t))
 
     def add_component_equations(self, solver):
         for i in range(self.component_count):

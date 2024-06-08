@@ -6,6 +6,9 @@ class Node:
     def set_potential(self, potential):
         self.potential = potential
 
+    def get_potential(self):
+        return self.potential
+
     def get_connections(self):
         return self.connections
 
