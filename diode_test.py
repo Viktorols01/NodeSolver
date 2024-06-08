@@ -1,7 +1,7 @@
 from classes.Node import Node
 from classes.Network import Network
 
-from classes.components.Resistance import Resistance
+from classes.components.Impedance import Impedance
 from classes.components.Source import Source
 from classes.components.Diode import Diode
 
@@ -11,7 +11,7 @@ node2 = Node()
 node3 = Node()
 
 # Create components
-resistance1 = Resistance(2)
+resistance1 = Impedance(1)
 diode = Diode(0.01)
 source = Source(5)
 

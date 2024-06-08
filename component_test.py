@@ -1,4 +1,4 @@
-from classes.components.Resistance import Resistance
+from classes.components.Impedance import Impedance
 from classes.components.Source import Source
 from classes.components.Diode import Diode
 

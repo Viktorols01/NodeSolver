@@ -1,4 +1,4 @@
-class Resistance:
+class Impedance:
     def __init__(self, R):
         self.R = R
 

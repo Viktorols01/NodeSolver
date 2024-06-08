@@ -1,7 +1,9 @@
 from classes.JFNKsolver import JFNKsolver
 
 class Network:
-    def __init__(self):
+    def __init__(self, complex = False):
+        self.complex = complex
+
         self.nodes = []
         self.node_names = []
         self.node_count = 0
@@ -20,7 +22,10 @@ class Network:
         self.component_count += 1
 
     def solve(self, initial_value = 1, ndigits = 2):
-        solver = JFNKsolver(initial_value=initial_value)
+        if self.complex:
+            solver = JFNKsolver(initial_value=initial_value, dtype=complex)
+        else:
+            solver = JFNKsolver(initial_value=initial_value, dtype=float)
         self.add_node_equations(solver)
         self.add_component_equations(solver)
         solver.solve(verbose=True, ndigits=ndigits)

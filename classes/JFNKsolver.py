@@ -3,13 +3,11 @@ import scipy
 
 from classes.Equation import Equation
 
-import time
-
 class JFNKsolver:
 
-    def __init__(self, initial_value = 1):
-
+    def __init__(self, initial_value = 1, dtype=float):
         self.initial_value = initial_value
+        self.dtype = dtype
 
         # Equations in system
         self.equations = []
@@ -79,7 +77,7 @@ class JFNKsolver:
     # Must be called after adding all equations?
     def __vectorize(self):
         n = len(self.equations)
-        self.variable_values = np.zeros(shape = [n], dtype = float)
+        self.variable_values = np.zeros(shape = [n], dtype = self.dtype)
         self.variable_names = []
         self.name_to_index = {}
 
@@ -106,7 +104,7 @@ class JFNKsolver:
     # return function with values q
     def __get_function(self, u):
         n = len(self.equations)
-        vector = np.zeros(shape = [n], dtype = float)
+        vector = np.zeros(shape = [n], dtype = self.dtype)
         for i in range(n):
             equation = self.equations[i]
             variable_values = []
