@@ -54,7 +54,11 @@ class JFNKsolver:
                 print("Iteration",k)
                 print("Function", self.__get_function(self.__get_vector()))
                 print("Residual", res)
-                print("Variable values", self.__get_vector())
+                print("Variables:") 
+                for i in range(len(self.variable_values)):
+                    name = self.variable_names[i]
+                    value = self.variable_values[i]
+                    print(name, value)
                 print("Previous variable increment", du)
             
             du = self.__solveIteration(verbose = verbose)

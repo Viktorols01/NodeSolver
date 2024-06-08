@@ -1,6 +1,12 @@
-class Resistance:
-    def __init__(self, R):
-        self.R = R
+import numpy as np
+
+class Diode:
+    # Shockley diode equation is problematic...
+    def __init__(self, Is):
+        self.Is = Is
+
+        # Thermal voltage
+        self.V_thermal = 25.9*10**-3
 
         self.current = 0
         self.sockets = {"in" : None, "out" : None}
@@ -19,4 +25,4 @@ class Resistance:
 
     # u_in, u_out, i
     def function(self):
-        return lambda x : (x[0] - x[1])/self.R - x[2]
+        return lambda x : self.Is*(np.exp((x[0] - x[1])/self.V_thermal)-1) - x[2]

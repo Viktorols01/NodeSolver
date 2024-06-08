@@ -19,11 +19,11 @@ class Network:
         self.component_names.append(f"component {self.component_count}")
         self.component_count += 1
 
-    def solve(self):
-        solver = JFNKsolver(initial_value=0)
+    def solve(self, initial_value = 1, ndigits = 2):
+        solver = JFNKsolver(initial_value=initial_value)
         self.add_node_equations(solver)
         self.add_component_equations(solver)
-        solver.solve(verbose=True, ndigits=2)
+        solver.solve(verbose=True, ndigits=ndigits)
         
         variable_map = solver.get_variable_map()
         for variable_name in variable_map:
@@ -79,10 +79,4 @@ class Network:
             index_out = self.nodes.index(node_out)
             name_out = self.node_names[index_out]
 
-            if index_in == 0:
-                solver.add_equation(3, [name_out, name_in, name], component.function_in_known())
-            elif index_out == 0:
-                solver.add_equation(3, [name_out, name_in, name], component.function_out_known())
-            else:
-                solver.add_equation(3, [name_out, name_in, name], component.function())
-            
+            solver.add_equation(3, [name_in, name_out, name], component.function())

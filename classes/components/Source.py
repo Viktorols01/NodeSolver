@@ -1,7 +1,6 @@
 class Source:
     def __init__(self, Vs):
         self.Vs = Vs
-        self.type = "Source"
         
         self.current = 0
         self.sockets = {"in" : None, "out" : None}
@@ -18,12 +17,6 @@ class Source:
     def get_current(self):
         return self.current
     
-    # u_out, u_in, i
+    # # u_in, u_out, i
     def function(self):
-        return lambda x: x[0] - x[1] - self.Vs
-        
-    def function_in_known(self):
-        return lambda x: x[0] - 0 - self.Vs
-    
-    def function_out_known(self):
-        return lambda x: 0 - x[1] - self.Vs
+        return lambda x: x[0] + self.Vs - x[1]
