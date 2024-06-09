@@ -1,6 +1,6 @@
-from classes.JFNKsolver import JFNKsolver
+from classes.solvers.JFNKsolver import JFNKsolver
 
-class Network:
+class Network_solver:
     def __init__(self, complex = False):
         self.complex = complex
 
@@ -26,8 +26,8 @@ class Network:
             solver = JFNKsolver(initial_value=initial_value, dtype=complex)
         else:
             solver = JFNKsolver(initial_value=initial_value, dtype=float)
-        self.add_node_equations(solver)
-        self.add_component_equations(solver)
+        self.__add_node_equations(solver)
+        self.__add_component_equations(solver)
         solver.solve(verbose=True, ndigits=ndigits)
         
         variable_map = solver.get_variable_map()
@@ -42,7 +42,7 @@ class Network:
                 index = self.component_names.index(variable_name)
                 self.components[index].set_current(variable_value)
 
-    def add_node_equations(self, solver):
+    def __add_node_equations(self, solver):
         solver.add_equation(1, [self.node_names[0]], lambda x: x[0])
 
         for i in range(1, self.node_count):
@@ -71,7 +71,7 @@ class Network:
                 return sum
             solver.add_equation(n, name_list, lambda x, s = sign_list, t = n: function(x, s, t))
 
-    def add_component_equations(self, solver):
+    def __add_component_equations(self, solver):
         for i in range(self.component_count):
             component = self.components[i]
             name = self.component_names[i]

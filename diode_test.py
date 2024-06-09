@@ -1,5 +1,5 @@
-from classes.Node import Node
-from classes.Network import Network
+from classes.nodes.Node import Node
+from classes.solvers.Network import Network_solver
 
 from classes.components.Impedance import Impedance
 from classes.components.Source import Source
@@ -11,9 +11,9 @@ node2 = Node()
 node3 = Node()
 
 # Create components
-resistance1 = Impedance(1)
+resistance1 = Impedance(2)
 diode = Diode(0.01)
-source = Source(5)
+source = Source(10)
 
 # Connect nodes
 node1.connect_to(resistance1, "out")
@@ -26,14 +26,14 @@ node3.connect_to(diode, "out")
 node3.connect_to(resistance1, "in")
 
 # Add to network and solve
-network = Network()
+network = Network_solver()
 network.add_node(node1)
 network.add_node(node2)
 network.add_node(node3)
 network.add_component(resistance1)
 network.add_component(source)
 network.add_component(diode)
-network.solve(initial_value=1, ndigits=5)
+network.solve(initial_value=1, ndigits=2)
 
 # Solved results:
 print("Node 1", node1.get_potential(), "V")

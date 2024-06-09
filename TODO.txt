@@ -1,0 +1,3 @@
++ GUI
++ Eisenstat-Walker method
++ Further complex numbers, generalize 

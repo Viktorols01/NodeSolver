@@ -2,6 +2,11 @@ from classes.components.Impedance import Impedance
 from classes.components.Source import Source
 from classes.components.Diode import Diode
 
+# Resistance
+resistance_function = Impedance(2).function()
+value = resistance_function([2, 0, 1])
+assert value == 0, "resistance equation not fulfilled"
+
 # Source
 source_function = Source(1).function()
 value = source_function([0, 1, 1])

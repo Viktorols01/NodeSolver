@@ -1,5 +1,5 @@
-from classes.Node import Node
-from classes.Network import Network
+from classes.nodes.Node import Node
+from classes.solvers.Network import Network_solver
 
 from classes.components.Impedance import Impedance
 from classes.components.Source import Source
@@ -26,7 +26,7 @@ node2.connect_to(impedance1, "in")
 
 
 # Add to network and solve
-network = Network(complex=True)
+network = Network_solver(complex=True)
 network.add_node(node1)
 network.add_node(node2)
 network.add_component(impedance1)

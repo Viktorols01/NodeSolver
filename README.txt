@@ -1,11 +1,17 @@
-Idé:
-Varje nod har en spänning och ingående ström.
-En måste vara okänd.
+Koncept:
+    Varje nod bidrar med en ekvation och en variabel:
+    + ekvation: kirchoffs lag
+    + variabel: potential i nod
 
-För att modellera kopplingar så har vi en funktion: 
-    spänningarna på båda sidorna -> ström som flödar ut
-Även derivator måste inkluderas för Newton-Raphsons metod.
-Kom ihåg: Om vi är på U1
-(U1 - U2)/R = I_in
+    Varje komponent bidrar med en ekvation och en variabel
+    + ekvation: förhållande mellan kopplade spänningar och passerande ström
+    + variabel: genomgående ström
 
-Problem: Gå från struktur till vektorvärd funktion
+    Viktigt: En nod jordas, och ger därmed helt enkelt bara funktionen u - 0.
+    Jag jordar den första noden som läggs till i nätverket.
+
+Hur:
+    För att lösa ett olinjärt ekvationsystem gör vi om ekvationer till funktioner 
+    som ska vara 0. Sedan löser vi med JFNKsolver.
+
+    För att gå från nätverk till ekvationsystem använder vi klassen Network.
