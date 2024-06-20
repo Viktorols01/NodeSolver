@@ -4,5 +4,6 @@
 + Preconditioning???
 
 + solver components should use inheritance
++ gui components should use inheritance
 
 + Further complex numbers, generalize 

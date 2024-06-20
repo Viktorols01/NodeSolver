@@ -11,7 +11,7 @@ class GUIComponent(GUISocketElement):
             self.h = h
             self.is_dragged = False
 
-        def render(self, canvas):
+        def render_base(self, canvas):
             canvas.create_rectangle(
                 self.x,
                 self.y,
