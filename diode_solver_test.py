@@ -1,9 +1,9 @@
-from classes.nodes.Node import Node
-from classes.solvers.Network import Network_solver
+from classes.solver.nodes.Node import Node
+from classes.solver.SolverNetwork import SolverNetwork
 
-from classes.components.Impedance import Impedance
-from classes.components.Source import Source
-from classes.components.Diode import Diode
+from classes.solver.components.Impedance import Impedance
+from classes.solver.components.Source import Source
+from classes.solver.components.Diode import Diode
 
 # Create nodes
 node1 = Node()
@@ -26,7 +26,7 @@ node3.connect_to(diode, "out")
 node3.connect_to(resistance1, "in")
 
 # Add to network and solve
-network = Network_solver()
+network = SolverNetwork()
 network.add_node(node1)
 network.add_node(node2)
 network.add_node(node3)

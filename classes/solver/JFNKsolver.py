@@ -1,7 +1,7 @@
 import numpy as np
 import scipy
 
-from classes.solvers.Equation import Equation
+from classes.solver.Equation import Equation
 
 class JFNKsolver:
 

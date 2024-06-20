@@ -1,9 +1,9 @@
-from classes.nodes.Node import Node
-from classes.solvers.Network import Network_solver
+from classes.solver.nodes.Node import Node
+from classes.solver.SolverNetwork import Network_solver
 
-from classes.components.Impedance import Impedance
-from classes.components.Source import Source
-from classes.components.Diode import Diode
+from classes.solver.components.Impedance import Impedance
+from classes.solver.components.Source import Source
+from classes.solver.components.Diode import Diode
 
 # Constant rotation
 omega = 50

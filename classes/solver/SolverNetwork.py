@@ -1,6 +1,6 @@
-from classes.solvers.JFNKsolver import JFNKsolver
+from classes.solver.JFNKsolver import JFNKsolver
 
-class Network_solver:
+class SolverNetwork:
     def __init__(self, complex = False):
         self.complex = complex
 

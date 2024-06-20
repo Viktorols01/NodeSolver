@@ -1,6 +1,6 @@
-from classes.components.Impedance import Impedance
-from classes.components.Source import Source
-from classes.components.Diode import Diode
+from classes.solver.components.Impedance import Impedance
+from classes.solver.components.Source import Source
+from classes.solver.components.Diode import Diode
 
 # Resistance
 resistance_function = Impedance(2).function()

@@ -15,3 +15,7 @@ Hur:
     som ska vara 0. Sedan löser vi med JFNKsolver.
 
     För att gå från nätverk till ekvationsystem använder vi klassen Network.
+
+GUI:
+Skapa komponenter. Noder är också komponenter. Dessa har alla sockets, som kopplas ihop.
+(Det finns en djup likhet mellan det jag gjorde i solvers men )
