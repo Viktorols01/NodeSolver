@@ -1,7 +1,9 @@
 import tkinter as tk
 
+from classes.gui.GUIDiode import GUIDiode
 from classes.gui.GUINode import GUINode
 from classes.gui.GUIResistance import GUIResistance
+from classes.gui.GUISilentNode import GUISilentNode
 from classes.gui.GUISource import GUISource
 
 
@@ -19,13 +21,27 @@ class Window:
         self.held_offset_x = 0
         self.held_offset_y = 0
 
-        self.components = []
-        resistance_button = tk.Button(self.root, text="Resistance", command=lambda : self.components.append(GUIResistance(20, 20)))
+        self.draggables = []
+        resistance_button = tk.Button(
+            self.root,
+            text="Resistance",
+            command=lambda: self.draggables.append(GUIResistance(20, 20)),
+        )
         resistance_button.pack()
-        source_button = tk.Button(self.root, text="Source", command=lambda : self.components.append(GUISource(20, 20)))
+        source_button = tk.Button(
+            self.root,
+            text="Source",
+            command=lambda: self.draggables.append(GUISource(20, 20)),
+        )
+        source_button.pack()
+        source_button = tk.Button(
+            self.root,
+            text="Diode",
+            command=lambda: self.draggables.append(GUIDiode(20, 20)),
+        )
         source_button.pack()
 
-        source_button = tk.Button(self.root, text="Solve", command=lambda : solve(self))
+        source_button = tk.Button(self.root, text="Solve", command=lambda: solve(self))
         source_button.pack()
 
         self.canvas = tk.Canvas(self.root, background="red", width=width, height=height)
@@ -44,19 +60,19 @@ class Window:
 
     def __motion(self, event):
         pass
-    
+
     def __clicked_left(self, event):
         self.current_x = event.x
         self.current_y = event.y
         self.held_x = event.x
         self.held_y = event.y
 
-        for component in self.components:
-            touch_socket, socket = component.touched_socket(event.x, event.y)
+        for draggable in self.draggables:
+            touch_socket, touched_socket = draggable.touched_socket(event.x, event.y)
             if touch_socket:
-                if socket.can_connect():
+                if touched_socket.can_connect():
                     self.is_creating_connection = True
-                    self.connecting_socket = socket
+                    self.connecting_socket = touched_socket
                     return
 
     def __moved_left(self, event):
@@ -64,22 +80,46 @@ class Window:
         self.current_y = event.y
 
     def __released_left(self, event):
-        def connect(node1, node2):
-            node1.add_connection(node2)
-            node2.add_connection(node1)
+        def connect(socket1, socket2):
+            socket1.add_connection(socket2)
+            socket2.add_connection(socket1)
+
+        def connect_with_silent_node(socket1, socket2):
+            silentnode = GUISilentNode(socket1, socket2)
+            connect(socket1, silentnode.sockets[0])
+            connect(silentnode.sockets[1], socket2)
+            self.draggables.append(silentnode)
 
         if self.is_creating_connection:
             self.is_creating_connection = False
-            at_reasonable_distance = (self.current_x - self.held_x)**2 + (self.current_y - self.held_y)**2 > 100
+            at_reasonable_distance = (self.current_x - self.held_x) ** 2 + (
+                self.current_y - self.held_y
+            ) ** 2 > 100
             if at_reasonable_distance:
-                for component in self.components:
-                    touch_socket, socket = component.touched_socket(event.x, event.y)
+                for draggable in self.draggables:
+                    touch_socket, touched_socket = draggable.touched_socket(
+                        event.x, event.y
+                    )
                     if touch_socket:
-                        connect(self.connecting_socket, socket)
+                        # Connect to component
+                        if isinstance(
+                            self.connecting_socket.component, GUINode
+                        ) and isinstance(touched_socket.component, GUINode):
+                            connect_with_silent_node(
+                                self.connecting_socket, touched_socket
+                            )
+                        elif isinstance(
+                            self.connecting_socket.component, GUINode
+                        ) or isinstance(touched_socket.component, GUINode):
+                            connect(self.connecting_socket, touched_socket)
                         return
+                # Connect to new node
                 node = GUINode(self.current_x, self.current_y)
-                connect(self.connecting_socket, node.socket)
-                self.components.append(node)
+                if isinstance(self.connecting_socket.component, GUINode):
+                    connect_with_silent_node(self.connecting_socket, node.socket)
+                else:
+                    connect(self.connecting_socket, node.socket)
+                self.draggables.append(node)
                 return
 
     def __clicked_right(self, event):
@@ -88,40 +128,39 @@ class Window:
         self.held_x = event.x
         self.held_y = event.y
 
-        for component in self.components:
-            if component.touched(event.x, event.y):
-                self.held_offset_x = event.x - component.x
-                self.held_offset_y = event.y - component.y
-                component.is_dragged = True
+        for draggable in self.draggables:
+            if draggable.touched(event.x, event.y):
+                self.held_offset_x = event.x - draggable.x
+                self.held_offset_y = event.y - draggable.y
+                draggable.is_dragged = True
                 return
 
     def __moved_right(self, event):
         self.current_x = event.x
         self.current_y = event.y
 
-        for component in self.components:
-            if component.is_dragged:
-                component.move(event.x - self.held_offset_x, event.y - self.held_offset_y)
+        for draggable in self.draggables:
+            if draggable.is_dragged:
+                draggable.move(
+                    event.x - self.held_offset_x, event.y - self.held_offset_y
+                )
                 return
 
     def __released_right(self, event):
-        for component in self.components:
-            if component.is_dragged:
-                component.is_dragged = False
+        for draggable in self.draggables:
+            if draggable.is_dragged:
+                draggable.is_dragged = False
 
     def render(self):
         self.canvas.delete("all")
-        for component in self.components:
-            component.render(self.canvas)
+        for draggable in self.draggables:
+            draggable.render(self.canvas)
 
         if self.is_creating_connection:
             self.canvas.create_line(
-                self.held_x,
-                self.held_y,
-                self.current_x,
-                self.current_y,
-                dash = (2, 2)
+                self.held_x, self.held_y, self.current_x, self.current_y, dash=(2, 2)
             )
+            self.connecting_socket.render(self.canvas, self.current_x, self.current_y)
 
         self.canvas.pack()
         self.root.after(10, self.render)

@@ -1,9 +1,9 @@
-from classes.solver.components.Resistance import Impedance
+from classes.solver.components.Resistance import Resistance
 from classes.solver.components.Source import Source
 from classes.solver.components.Diode import Diode
 
 # Resistance
-resistance_function = Impedance(2).function()
+resistance_function = Resistance(2).function()
 value = resistance_function([2, 0, 1])
 assert value == 0, "resistance equation not fulfilled"
 

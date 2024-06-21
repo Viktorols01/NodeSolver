@@ -1,7 +1,7 @@
 from classes.solver.nodes.Node import Node
 from classes.solver.SolverNetwork import Network_solver
 
-from classes.solver.components.Resistance import Impedance
+from classes.solver.components.Resistance import Resistance
 from classes.solver.components.Source import Source
 from classes.solver.components.Diode import Diode
 
@@ -13,8 +13,8 @@ node1 = Node()
 node2 = Node()
 
 # Create components
-C = 1*10^-9
-impedance1 = Impedance(complex(0, -1/(omega*C)))
+C = 1 * 10 ^ -9
+impedance1 = Resistance(complex(0, -1 / (omega * C)))
 source = Source(5)
 
 # Connect nodes

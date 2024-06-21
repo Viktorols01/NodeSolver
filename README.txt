@@ -17,5 +17,6 @@ Hur:
     För att gå från nätverk till ekvationsystem använder vi klassen Network.
 
 GUI:
-Skapa komponenter. Noder är också komponenter. Dessa har alla sockets, som kopplas ihop.
-(Det finns en djup likhet mellan det jag gjorde i solvers men )
+Skapa draggables. Noder är också dragables. Dessa har alla sockets, som kopplas ihop. 
+För att kunna skapa ekvationer måste det finnas tvåpoler med passerande ström mellan 
+alla noder. Därför introducerar vi SilentNode, som är hur mycket ström som passerar mellan två noder.

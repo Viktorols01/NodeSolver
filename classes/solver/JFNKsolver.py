@@ -3,9 +3,10 @@ import scipy
 
 from classes.solver.Equation import Equation
 
+
 class JFNKsolver:
 
-    def __init__(self, initial_value = 1, dtype=float):
+    def __init__(self, initial_value=1, dtype=float):
         self.initial_value = initial_value
         self.dtype = dtype
 
@@ -20,12 +21,18 @@ class JFNKsolver:
         self.variable_names = None
         self.name_to_index = None
 
-    def add_equation(self, variable_count, variable_names, function, variable_values = None):
-        assert variable_count == len(variable_names),"variable_count not equal to length of variable_names"
-        
+    def add_equation(
+        self, variable_count, variable_names, function, variable_values=None
+    ):
+        assert variable_count == len(
+            variable_names
+        ), "variable_count not equal to length of variable_names"
+
         if not variable_values is None:
-            assert variable_count == len(variable_values),"variable_count not equal to length of variable_values"
-        
+            assert variable_count == len(
+                variable_values
+            ), "variable_count not equal to length of variable_values"
+
         for i in range(variable_count):
             name = variable_names[i]
             if variable_values is None:
@@ -37,37 +44,39 @@ class JFNKsolver:
 
         self.equations.append(Equation(variable_count, variable_names, function))
 
-    def solve(self, verbose = False, rtol = 0, atol = 10**-3, ndigits = 10):
+    def solve(self, verbose=False, rtol=0, atol=10**-3, ndigits=10):
         self.__vectorize()
 
         res_init = np.linalg.norm(self.__get_function(self.__get_vector()))
         res = res_init
-        
+
         du = 0
 
         k = 0
-        while res > rtol*res_init + atol:
+        while res > rtol * res_init + atol:
             k += 1
             if verbose:
-                print("Iteration",k)
+                print("Iteration", k)
                 print("Function", self.__get_function(self.__get_vector()))
                 print("Residual", res)
-                print("Variables:") 
+                print("Variables:")
                 for i in range(len(self.variable_values)):
                     name = self.variable_names[i]
                     value = self.variable_values[i]
                     print(name, value)
                 print("Previous variable increment", du)
-            
-            du = self.__solveIteration(verbose = verbose)
+
+            du = self.__solveIteration(verbose=verbose)
             self.variable_values = self.variable_values + du
 
             res = np.linalg.norm(self.__get_function(self.__get_vector()))
 
         if verbose:
-            print("Newton-Raphson finished in",k,"iterations.")
+            print("Newton-Raphson finished in", k, "iterations.")
             print("Initial norm:", res_init)
-            print("Final norm", np.linalg.norm(self.__get_function(self.__get_vector())))
+            print(
+                "Final norm", np.linalg.norm(self.__get_function(self.__get_vector()))
+            )
 
         self.__devectorize(ndigits)
 
@@ -77,12 +86,16 @@ class JFNKsolver:
     # Must be called after adding all equations?
     def __vectorize(self):
         n = len(self.equations)
-        self.variable_values = np.zeros(shape = [n], dtype = self.dtype)
+        self.variable_values = np.zeros(shape=[n], dtype=self.dtype)
         self.variable_names = []
         self.name_to_index = {}
 
-        assert n <= len(self.variable_values_map), f"more equations ({n}) than variables ({len(self.variable_values_map)})"
-        assert n >= len(self.variable_values_map), f"more variables ({len(self.variable_values_map)}) than equations ({n})"
+        assert n <= len(
+            self.variable_values_map
+        ), f"more equations ({n}) than variables ({len(self.variable_values_map)})"
+        assert n >= len(
+            self.variable_values_map
+        ), f"more variables ({len(self.variable_values_map)}) than equations ({n})"
 
         i = 0
         for name in self.variable_values_map:
@@ -92,7 +105,7 @@ class JFNKsolver:
             self.name_to_index[name] = i
             i += 1
 
-    def __devectorize(self, ndigits = 10):
+    def __devectorize(self, ndigits=10):
         n = len(self.variable_values)
         for i in range(n):
             name = self.variable_names[i]
@@ -104,7 +117,7 @@ class JFNKsolver:
     # return function with values q
     def __get_function(self, u):
         n = len(self.equations)
-        vector = np.zeros(shape = [n], dtype = self.dtype)
+        vector = np.zeros(shape=[n], dtype=self.dtype)
         for i in range(n):
             equation = self.equations[i]
             variable_values = []
@@ -114,21 +127,27 @@ class JFNKsolver:
                 variable_values.append(u[index])
             vector[i] = equation.evaluate(variable_values)
         return vector
-    
+
     def __get_jacobian_product(self, q):
         if np.linalg.norm(q) == 0:
             epsilon = 10**-7
         else:
-            epsilon = 10**-7/np.sqrt(np.linalg.norm(q))
+            epsilon = 10**-7 / np.sqrt(np.linalg.norm(q))
 
         u0 = self.__get_vector()
-        product = (self.__get_function(u0 + q*epsilon) - self.__get_function(u0))/epsilon
+        product = (
+            self.__get_function(u0 + q * epsilon) - self.__get_function(u0)
+        ) / epsilon
         return product
 
-    def __solveIteration(self, verbose = False):
+    def __solveIteration(self, verbose=False):
         n = len(self.variable_values)
 
-        A = scipy.sparse.linalg.LinearOperator((n, n), matvec = self.__get_jacobian_product)
-        du, info = scipy.sparse.linalg.gmres(A, -self.__get_function(self.__get_vector()))
-        
+        A = scipy.sparse.linalg.LinearOperator(
+            (n, n), matvec=self.__get_jacobian_product
+        )
+        du, info = scipy.sparse.linalg.gmres(
+            A, -self.__get_function(self.__get_vector())
+        )
+
         return du

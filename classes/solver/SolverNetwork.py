@@ -1,7 +1,8 @@
 from classes.solver.JFNKsolver import JFNKsolver
 
+
 class SolverNetwork:
-    def __init__(self, complex = False):
+    def __init__(self, complex=False):
         self.complex = complex
 
         self.nodes = []
@@ -21,15 +22,15 @@ class SolverNetwork:
         self.component_names.append(f"component {self.component_count}")
         self.component_count += 1
 
-    def solve(self, initial_value = 1, ndigits = 2):
+    def solve(self, verbose=False, initial_value=1, ndigits=2):
         if self.complex:
             solver = JFNKsolver(initial_value=initial_value, dtype=complex)
         else:
             solver = JFNKsolver(initial_value=initial_value, dtype=float)
         self.__add_node_equations(solver)
         self.__add_component_equations(solver)
-        solver.solve(verbose=True, ndigits=ndigits)
-        
+        solver.solve(verbose=verbose, ndigits=ndigits)
+
         variable_map = solver.get_variable_map()
         for variable_name in variable_map:
             variable_value = variable_map[variable_name]
@@ -59,7 +60,7 @@ class SolverNetwork:
                     sign_list.append(1)
                 else:
                     raise Exception("socket is not 'in' or 'our'")
-                
+
                 index = self.components.index(component)
                 name_list.append(self.component_names[index])
 
@@ -67,9 +68,12 @@ class SolverNetwork:
             def function(x, sign_list_, n_):
                 sum = 0
                 for j in range(n_):
-                    sum += sign_list_[j]*x[j]
+                    sum += sign_list_[j] * x[j]
                 return sum
-            solver.add_equation(n, name_list, lambda x, s = sign_list, t = n: function(x, s, t))
+
+            solver.add_equation(
+                n, name_list, lambda x, s=sign_list, t=n: function(x, s, t)
+            )
 
     def __add_component_equations(self, solver):
         for i in range(self.component_count):

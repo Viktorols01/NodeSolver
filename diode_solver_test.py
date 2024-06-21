@@ -1,7 +1,7 @@
 from classes.solver.nodes.Node import Node
 from classes.solver.SolverNetwork import SolverNetwork
 
-from classes.solver.components.Resistance import Impedance
+from classes.solver.components.Resistance import Resistance
 from classes.solver.components.Source import Source
 from classes.solver.components.Diode import Diode
 
@@ -11,7 +11,7 @@ node2 = Node()
 node3 = Node()
 
 # Create components
-resistance1 = Impedance(2)
+resistance1 = Resistance(2)
 diode = Diode(0.01)
 source = Source(10)
 

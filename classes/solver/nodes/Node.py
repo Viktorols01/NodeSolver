@@ -17,6 +17,9 @@ class Node:
 
         component.sockets[socket] = self
 
+    def reset(self):
+        self.connections = []
+        self.potential = 0
 
     # --- DEBUG ---
     def print(self, name, ndigits = 0):
